@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="webPaymentSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="full">
+        <property name="query" value="*********** recieved the web payment crequest *************"/>
+    </log>
+    <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="webpayment"/>
+    <property expression="json-eval($.currency)" name="currency" scope="default" type="STRING"/>
+    <property expression="json-eval($.order_id)" name="order_id" scope="default" type="STRING"/>
+    <property expression="json-eval($.amount)" name="amount" scope="default" type="FLOAT"/>
+    <property expression="json-eval($.lang)" name="language" scope="default" type="STRING"/>
+    <property expression="json-eval($.reference)" name="reference" scope="default" type="STRING"/>
+    <property name="key" scope="default" type="STRING" value="a86b2087"/>
+    <log level="custom">
+        <property expression="get-property('order_id')" name="order_id"/>
+    </log>
+    <dbreport>
+        <connection>
+            <pool>
+                <driver>com.mysql.jdbc.Driver</driver>
+                <url>jdbc:mysql://localhost:3306/orange</url>
+                <user>root</user>
+                <password>root</password>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[insert into OMONEY_LOG (ORDER_ID, CURRENCY, AMOUNT, LANG, REFERENCE) values ( ?,?,?,?,? )]]></sql>
+            <parameter expression="get-property('order_id')" type="VARCHAR"/>
+            <parameter expression="get-property('currency')" type="VARCHAR"/>
+            <parameter expression="get-property('amount')" type="FLOAT"/>
+            <parameter expression="get-property('language')" type="VARCHAR"/>
+            <parameter expression="get-property('reference')" type="VARCHAR"/>
+        </statement>
+    </dbreport>
+    <dblookup>
+        <connection>
+            <pool>
+                <driver>com.mysql.jdbc.Driver</driver>
+                <url>jdbc:mysql://localhost:3306/orange</url>
+                <user>root</user>
+                <password>root</password>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[select * from OMONEY_LOG where ORDER_ID =  ?]]></sql>
+            <parameter expression="get-property('order_id')" type="VARCHAR"/>
+            <result column="AMOUNT" name="AMOUNT"/>
+            <result column="REFERENCE" name="REFERENCE"/>
+        </statement>
+    </dblookup>
+    <log level="custom">
+        <property expression="get-property('AMOUNT')" name="AMOUNT"/>
+        <property expression="get-property('REFERENCE')" name="REFERENCE"/>
+    </log>
+    <send>
+        <endpoint key="omoneyEp"/>
+    </send>
+</sequence>
