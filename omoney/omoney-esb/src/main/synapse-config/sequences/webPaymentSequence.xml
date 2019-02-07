@@ -1,56 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="webPaymentSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="full">
+    <log level="custom">
         <property name="query" value="*********** recieved the web payment crequest *************"/>
     </log>
     <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="webpayment"/>
+
+    <property expression="get-property('registry', 'conf:/omoney_config.xml')" name="xmlFile" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:xmlFile//merchant_key" name="reg_merchant_key" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:xmlFile//security/consumer_key" name="reg_consumer_key" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:xmlFile//security/access_token" name="reg_access_token" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:xmlFile//endPoints/notify" name="reg_notify" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+
     <property expression="json-eval($.currency)" name="currency" scope="default" type="STRING"/>
     <property expression="json-eval($.order_id)" name="order_id" scope="default" type="STRING"/>
     <property expression="json-eval($.amount)" name="amount" scope="default" type="FLOAT"/>
     <property expression="json-eval($.lang)" name="language" scope="default" type="STRING"/>
     <property expression="json-eval($.reference)" name="reference" scope="default" type="STRING"/>
-    <property name="key" scope="default" type="STRING" value="a86b2087"/>
+
     <log level="custom">
-        <property expression="get-property('order_id')" name="order_id"/>
+        <property expression="get-property('order_id')" name="order_id" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
     <dbreport>
         <connection>
             <pool>
-                <driver>com.mysql.jdbc.Driver</driver>
-                <url>jdbc:mysql://localhost:3306/orange</url>
-                <user>root</user>
-                <password>root</password>
+                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
             </pool>
         </connection>
         <statement>
             <sql><![CDATA[insert into OMONEY_LOG (ORDER_ID, CURRENCY, AMOUNT, LANG, REFERENCE) values ( ?,?,?,?,? )]]></sql>
-            <parameter expression="get-property('order_id')" type="VARCHAR"/>
-            <parameter expression="get-property('currency')" type="VARCHAR"/>
-            <parameter expression="get-property('amount')" type="FLOAT"/>
-            <parameter expression="get-property('language')" type="VARCHAR"/>
-            <parameter expression="get-property('reference')" type="VARCHAR"/>
+            <parameter expression="get-property('order_id')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="get-property('currency')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="get-property('amount')" type="FLOAT" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="get-property('language')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="get-property('reference')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
     <dblookup>
         <connection>
             <pool>
-                <driver>com.mysql.jdbc.Driver</driver>
-                <url>jdbc:mysql://localhost:3306/orange</url>
-                <user>root</user>
-                <password>root</password>
+                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
             </pool>
         </connection>
         <statement>
-            <sql><![CDATA[select * from OMONEY_LOG where ORDER_ID =  ?]]></sql>
-            <parameter expression="get-property('order_id')" type="VARCHAR"/>
-            <result column="AMOUNT" name="AMOUNT"/>
-            <result column="REFERENCE" name="REFERENCE"/>
+            <sql><![CDATA[ SELECT * FROM omoney_keys ORDER BY ID DESC LIMIT 1 ]]></sql>
+            <result column="ACCESS_TOKEN" name="access_token"/>
+            <result column="LOGGED_TIME" name="token_time"/>
         </statement>
     </dblookup>
     <log level="custom">
-        <property expression="get-property('AMOUNT')" name="AMOUNT"/>
-        <property expression="get-property('REFERENCE')" name="REFERENCE"/>
+        <property expression="get-property('access_token')" name="access_token" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="get-property('token_time')" name="token_time" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
+
+    <property xmlns:ns="http://org.apache.synapse/xsd"
+              name="Authorization"
+              expression="fn:concat('Basic ', get-property('access_token'))"
+              scope="transport"/>
+
+    <enrich>
+        <source clone="true" type="inline">
+            <merchant_key xmlns=""/>
+        </source>
+        <target action="child" xmlns:ns="http://org.apache.synapse/xsd" xpath="//jsonObject"/>
+    </enrich>
+    <enrich>
+        <source clone="true" property="reg_merchant_key" type="property"/>
+        <target xmlns:ns="http://org.apache.synapse/xsd" xpath="//merchant_key"/>
+    </enrich>
+    <enrich>
+        <source clone="true" property="reg_notify" type="property"/>
+        <target xmlns:ns="http://org.apache.synapse/xsd" xpath="//notif_url"/>
+    </enrich>
+    <enrich>
+        <source clone="true" xmlns:ns="http://org.apache.synapse/xsd" xpath="//jsonObject"/>
+        <target type="body"/>
+    </enrich>
+    <log level="full"/>
     <send>
         <endpoint key="omoneyEp"/>
     </send>

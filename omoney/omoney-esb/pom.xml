@@ -3,11 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.apigate.omoney</groupId>
-    <artifactId>omoney</artifactId>
+    <groupId>com.apigate</groupId>
+    <artifactId>orange-money</artifactId>
     <version>1.0.0</version>
   </parent>
-  <groupId>com.example.omoney-esb</groupId>
+  <groupId>com.apigate.omoney-esb</groupId>
   <artifactId>omoney-esb</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
@@ -110,6 +110,26 @@
       </plugin>
       <plugin>
         <groupId>org.wso2.maven</groupId>
+        <artifactId>wso2-esb-api-plugin</artifactId>
+        <version>2.1.0</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>api</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>pom-gen</goal>
+            </goals>
+            <configuration>
+              <artifactLocation>.</artifactLocation>
+              <typeList>${artifact.types}</typeList>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration />
+      </plugin>
+      <plugin>
+        <groupId>org.wso2.maven</groupId>
         <artifactId>wso2-esb-endpoint-plugin</artifactId>
         <version>2.1.0</version>
         <extensions>true</extensions>
@@ -136,26 +156,6 @@
         <executions>
           <execution>
             <id>sequence</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>pom-gen</goal>
-            </goals>
-            <configuration>
-              <artifactLocation>.</artifactLocation>
-              <typeList>${artifact.types}</typeList>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration />
-      </plugin>
-      <plugin>
-        <groupId>org.wso2.maven</groupId>
-        <artifactId>wso2-esb-api-plugin</artifactId>
-        <version>2.1.0</version>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>api</id>
             <phase>process-resources</phase>
             <goals>
               <goal>pom-gen</goal>

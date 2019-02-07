@@ -2,7 +2,8 @@
 <api context="/omoney" name="oMoneyAPI" xmlns="http://ws.apache.org/ns/synapse">
     <resource faultSequence="FaultSequence" inSequence="webPaymentSequence" methods="POST" url-mapping="/webpayment">
         <outSequence>
-            <send/>
+            <sequence key="webPaymentResponseSequence"/>
+            <respond/>
         </outSequence>
     </resource>
     <resource faultSequence="FaultSequence" inSequence="paymentStatusSequence" methods="POST" url-mapping="/transactionstatus">

@@ -2,15 +2,16 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.apigate.omoney</groupId>
-  <artifactId>omoney</artifactId>
+  <groupId>com.apigate</groupId>
+  <artifactId>orange-money</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
-  <name>omoney</name>
-  <description>omoney</description>
+  <name>orange-money</name>
+  <description>orange-money</description>
   <modules>
     <module>omoney-esb</module>
-    <module>omoney-car</module>
+    <module>omoney-class</module>
+    <module>omoney-composite</module>
   </modules>
   <build>
     <plugins>
