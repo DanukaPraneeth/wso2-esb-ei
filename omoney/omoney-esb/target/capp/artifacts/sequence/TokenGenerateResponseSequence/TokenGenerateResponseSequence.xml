@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="TokenGenerateResponseSequence"
+          onError="TokenFaultSequence" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="custom">
+        <property name="query" value="*********** Outsequence of token generation request *************"/>
+    </log>
+</sequence>

@@ -26,4 +26,7 @@
     <artifact name="TokenGenerateSequence" groupId="com.apigate.omoney-esb.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
         <file>src/main/synapse-config/sequences/TokenGenerateSequence.xml</file>
     </artifact>
+    <artifact name="TokenGenerateResponseSequence" groupId="com.apigate.omoney-esb.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/TokenGenerateResponseSequence.xml</file>
+    </artifact>
 </artifacts>
