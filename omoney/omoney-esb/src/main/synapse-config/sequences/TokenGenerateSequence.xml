@@ -3,39 +3,84 @@
     <log level="custom">
         <property name="query" value="*********** Initiated the token generation request *************"/>
     </log>
-    <property name="uri.var.omoney_backend.name" scope="default"
-              type="STRING" value="webpayment"/>
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS = 'ACTIVE' ]]></sql>
+            <result column="ACCESS_TOKEN" name="access_token"/>
+            <result column="ID" name="expired_id"/>
+            <result column="EXPIRE_TIME_MS" name="expire_time"/>
+            <result column="EXPIRES_IN" name="token_duration"/>
+        </statement>
+    </dblookup>
+    <property name="buffer" scope="default" type="STRING" value="120000"/>
     <property
-            expression="get-property('registry', 'conf:/omoney_config.xml')"
-            name="xmlFile" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property expression="$ctx:xmlFile//security/consumer_key"
-              name="reg_consumer_key" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+            expression="get-property('expire_time') - get-property('buffer')"
+            name="expire_limit" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
     <property
-            expression="fn:concat('Basic ', get-property('reg_consumer_key'))"
-            name="Authorization" scope="transport" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property name="grant_type" scope="default" type="STRING" value="client_credentials"/>
-    <payloadFactory media-type="xml">
-        <format>
-            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-                <soapenv:Body>
-                    <root xmlns="">
-                        <grant_type>$1</grant_type>
-                    </root>
-                </soapenv:Body>
-            </soapenv:Envelope>
-        </format>
-        <args>
-            <arg evaluator="xml" expression="$ctx:grant_type" xmlns:ns="http://org.apache.synapse/xsd"/>
-        </args>
-    </payloadFactory>
-    <property name="messageType" scope="axis2" type="STRING" value="application/x-www-form-urlencoded"/>
-    <property name="DISABLE_CHUNKING" scope="axis2" type="STRING" value="true"/>
-    <log level="full">
-        <property expression="get-property('reg_consumer_key')"
-                  name="key" xmlns:ns="http://org.apache.synapse/xsd"/>
-        <property name="query" value="*********** Ending the token generation request *************"/>
+            expression="get-property('SYSTEM_TIME') > get-property('expire_limit')"
+            name="compareTime" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <log level="custom">
+        <property expression="get-property('expire_limit')"
+                  name="expire_limit_log" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="get-property('SYSTEM_TIME')"
+                  name="server_time_log" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="get-property('expire_time')"
+                  name="expire_time_log" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property
+                expression="get-property('SYSTEM_TIME') > get-property('expire_time')"
+                name="compareTime" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
-    <send receive="TokenGenerateResponseSequence">
-        <endpoint key="omoneyEp"/>
-    </send>
+    <filter regex="true" source="get-property('compareTime')" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <log level="custom">
+                <property name="service" value="Token expired"/>
+            </log>
+            <property name="uri.var.omoney_backend.name" scope="default"
+                      type="STRING" value="token"/>
+            <property
+                    expression="get-property('registry', 'conf:/omoney_config.xml')"
+                    name="xmlFile" scope="default" type="OM"/>
+            <property expression="$ctx:xmlFile//security/consumer_key"
+                      name="reg_consumer_key" scope="default" type="STRING"/>
+            <property
+                    expression="fn:concat('Basic ', get-property('reg_consumer_key'))"
+                    name="Authorization" scope="transport" type="STRING"/>
+            <property name="grant_type" scope="default" type="STRING" value="client_credentials"/>
+            <payloadFactory media-type="xml">
+                <format>
+                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                        <soapenv:Body>
+                            <root xmlns="">
+                                <grant_type>$1</grant_type>
+                            </root>
+                        </soapenv:Body>
+                    </soapenv:Envelope>
+                </format>
+                <args>
+                    <arg evaluator="xml" expression="$ctx:grant_type"/>
+                </args>
+            </payloadFactory>
+            <property name="messageType" scope="axis2" type="STRING" value="application/x-www-form-urlencoded"/>
+            <property name="DISABLE_CHUNKING" scope="axis2"
+                      type="STRING" value="true"/>
+            <log level="full">
+                <property expression="get-property('token_date')" name="key"/>
+                <property expression="get-property('reg_consumer_key')" name="key"/>
+                <property name="query" value="*********** Ending the token generation request *************"/>
+            </log>
+            <send receive="TokenGenerateResponseSequence">
+                <endpoint key="omoneyEp"/>
+            </send>
+        </then>
+        <else>
+            <log level="custom">
+                <property name="service" value="Token not expired"/>
+            </log>
+        </else>
+    </filter>
 </sequence>
