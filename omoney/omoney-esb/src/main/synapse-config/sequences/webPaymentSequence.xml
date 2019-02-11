@@ -16,8 +16,9 @@
     <property expression="json-eval($.amount)" name="amount" scope="default" type="FLOAT"/>
     <property expression="json-eval($.lang)" name="language" scope="default" type="STRING"/>
     <property expression="json-eval($.reference)" name="reference" scope="default" type="STRING"/>
+    <property expression="json-eval($.notif_url)" name="notif_url" scope="default" type="STRING"/>
 
-    <log level="custom">
+    <log category="DEBUG" level="custom">
         <property expression="get-property('order_id')" name="order_id" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
     <dbreport>
@@ -27,12 +28,13 @@
             </pool>
         </connection>
         <statement>
-            <sql><![CDATA[insert into OMONEY_LOG (ORDER_ID, CURRENCY, AMOUNT, LANG, REFERENCE) values ( ?,?,?,?,? )]]></sql>
+            <sql><![CDATA[insert into OMONEY_LOG (ORDER_ID, CURRENCY, AMOUNT, LANG, REFERENCE, NOTIFY_URL) values ( ?,?,?,?,?,? )]]></sql>
             <parameter expression="get-property('order_id')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
             <parameter expression="get-property('currency')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
             <parameter expression="get-property('amount')" type="FLOAT" xmlns:ns="http://org.apache.synapse/xsd"/>
             <parameter expression="get-property('language')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
             <parameter expression="get-property('reference')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="get-property('notif_url')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
     <dblookup>
@@ -42,14 +44,13 @@
             </pool>
         </connection>
         <statement>
-            <sql><![CDATA[ SELECT * FROM omoney_keys ORDER BY ID DESC LIMIT 1 ]]></sql>
+            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS= ? ORDER BY ID DESC LIMIT 1 ]]></sql>
+            <parameter name="STATUS" value="ACTIVE" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
             <result column="ACCESS_TOKEN" name="access_token"/>
-            <result column="LOGGED_TIME" name="token_time"/>
         </statement>
     </dblookup>
-    <log level="custom">
+    <log category="DEBUG" level="custom">
         <property expression="get-property('access_token')" name="access_token" xmlns:ns="http://org.apache.synapse/xsd"/>
-        <property expression="get-property('token_time')" name="token_time" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 
     <property xmlns:ns="http://org.apache.synapse/xsd"

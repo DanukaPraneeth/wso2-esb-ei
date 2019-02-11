@@ -17,7 +17,7 @@
             <result column="EXPIRES_IN" name="token_duration"/>
         </statement>
     </dblookup>
-    <property name="buffer" scope="default" type="STRING" value="120000"/>
+    <property name="buffer" scope="default" type="STRING" value="432000000"/>
     <property
             expression="get-property('expire_time') - get-property('buffer')"
             name="expire_limit" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
@@ -38,7 +38,7 @@
     <filter regex="true" source="get-property('compareTime')" xmlns:ns="http://org.apache.synapse/xsd">
         <then>
             <log level="custom">
-                <property name="service" value="Token expired"/>
+                <property name="service" value="Token expired. Generating a new token"/>
             </log>
             <property name="uri.var.omoney_backend.name" scope="default"
                       type="STRING" value="token"/>
@@ -68,10 +68,9 @@
             <property name="messageType" scope="axis2" type="STRING" value="application/x-www-form-urlencoded"/>
             <property name="DISABLE_CHUNKING" scope="axis2"
                       type="STRING" value="true"/>
-            <log level="full">
+            <log category="DEBUG" level="full">
                 <property expression="get-property('token_date')" name="key"/>
                 <property expression="get-property('reg_consumer_key')" name="key"/>
-                <property name="query" value="*********** Ending the token generation request *************"/>
             </log>
             <send receive="TokenGenerateResponseSequence">
                 <endpoint key="omoneyEp"/>

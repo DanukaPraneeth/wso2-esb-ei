@@ -9,4 +9,7 @@
     <resource faultSequence="FaultSequence" inSequence="paymentStatusSequence" methods="POST" url-mapping="/transactionstatus">
         <outSequence/>
     </resource>
+    <resource faultSequence="FaultSequence" inSequence="paymentNotification" methods="POST" url-mapping="/notif">
+        <outSequence/>
+    </resource>
 </api>

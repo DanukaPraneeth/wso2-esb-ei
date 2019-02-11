@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="TokenGenerateResponseSequence"
           onError="TokenFaultSequence" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="full">
+    <log level="custom">
         <property name="query" value="*********** Outsequence of token generation request *************"/>
-        <property expression="get-property('expired_id')" name="query2" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
     <property expression="json-eval($.access_token)" name="access_token"
               scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
@@ -48,7 +47,4 @@
                        type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
-    <log level="custom">
-        <property name="query" value="*********** Token Generation Outsequence Finished *************"/>
-    </log>
 </sequence>

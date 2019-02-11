@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="paymentStatusSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="full">
+    <log level="custom">
         <property name="status" value="********** Payment Status Request Started*********"/>
     </log>
     <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="transactionstatus"/>
@@ -29,4 +29,5 @@
     <call>
         <endpoint key="omoneyEp"/>
     </call>
+    <respond/>
 </sequence>

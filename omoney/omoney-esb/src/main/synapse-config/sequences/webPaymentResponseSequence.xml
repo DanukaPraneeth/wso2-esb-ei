@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="webPaymentResponseSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="full">
+    <log level="custom">
         <property name="query2" value="*********** recieved from Orange back-end *************"/>
     </log>
     
