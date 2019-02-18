@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><artifacts>
+    <artifact name="omoneyAPI" groupId="com.example.com.apigate.omoney.synapse.api" version="1.0.0" type="synapse/api" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/api/omoneyAPI.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.faultSequence" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.faultSequence.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.tokenFaultSequence" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.tokenFaultSequence.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.dbStatusUpdator" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.dbStatusUpdator.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.merchantPaymentRequest" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.merchantPaymentRequest.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.merchantPaymentResponse" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.merchantPaymentResponse.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.paymentNotification" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.paymentNotification.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.periodicStatusRequest" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.periodicStatusRequest.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.tokenGenerator" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.tokenGenerator.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.tokenResponse" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.tokenResponse.xml</file>
+    </artifact>
+    <artifact name="merchantEnd" groupId="com.example.com.apigate.omoney.synapse.endpoint" version="1.0.0" type="synapse/endpoint" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/endpoints/merchantEnd.xml</file>
+    </artifact>
+    <artifact name="orangeEnd" groupId="com.example.com.apigate.omoney.synapse.endpoint" version="1.0.0" type="synapse/endpoint" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/endpoints/orangeEnd.xml</file>
+    </artifact>
+    <artifact name="nodeRedEnd" groupId="com.example.com.apigate.omoney.synapse.endpoint" version="1.0.0" type="synapse/endpoint" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/endpoints/nodeRedEnd.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.merchantStatusRequest" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/com.apigate.omoney.merchantStatusRequest.xml</file>
+    </artifact>
+</artifacts>

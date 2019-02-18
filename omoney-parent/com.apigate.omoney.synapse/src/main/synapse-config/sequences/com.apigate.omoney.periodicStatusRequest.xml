@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.periodicStatusRequest" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="custom">
+        <property name="query" value="*********** starting the db update *************"/>
+    </log>
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS= ? ORDER BY ID DESC LIMIT 1 ]]></sql>
+            <parameter type="VARCHAR" value="ACTIVE"/>
+            <result column="ACCESS_TOKEN" name="access_token"/>
+        </statement>
+    </dblookup>
+
+    <property name="SELECT_QUERY" value="SELECT ORDER_ID, AMOUNT, PAY_TOKEN, STATUS, COUNTER FROM OMONEY_LOG WHERE (STATUS='INITIATED' OR STATUS='PENDING') AND 5 > COUNTER AND LOGGED_TIME >= NOW() - INTERVAL 4 HOUR"/>
+    <property name="SELECT_QUERY_ENRICH_BODY" scope="default" type="STRING" value="true"/>
+    <class name="com.wso2telco.dep.common.mediation.SelectQueryExecutingMediator"/>
+    <log level="custom">
+        <property expression="count(//RESULT_ARRAY)" name="db query result count for status request" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <iterate attachPath="$body" continueParent="true" sequential="true"
+             expression="//RESULT_ARRAY" id="selectionMediator" preservePayload="true"
+             xmlns:ns="http://org.apache.synapse/xsd">
+        <target>
+            <sequence>
+                <property expression="//RESULT_ARRAY/ORDER_ID/text()" name="order_id"/>
+                <property expression="//RESULT_ARRAY/AMOUNT/text()" name="amount"/>
+                <property expression="//RESULT_ARRAY/PAY_TOKEN/text()" name="pay_token"/>
+                <property expression="//RESULT_ARRAY/STATUS/text()" name="payment_status"/>
+                <property expression="//RESULT_ARRAY/COUNTER/text()" name="counter"/>
+
+                <payloadFactory media-type="json">
+                    <format>
+                        {
+                            "order_id": "$1",
+                            "amount": $2,
+                            "pay_token": "$3"
+                        }
+                    </format>
+                    <args>
+                        <arg evaluator="xml" expression="//RESULT_ARRAY/ORDER_ID/text()"/>
+                        <arg evaluator="xml" expression="//RESULT_ARRAY/AMOUNT/text()"/>
+                        <arg evaluator="xml" expression="//RESULT_ARRAY/PAY_TOKEN/text()"/>
+                    </args>
+                </payloadFactory>
+                <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="transactionstatus"/>
+                <property name="Authorization" expression="fn:concat('Basic ', get-property('access_token'))" scope="transport" type="STRING"/>
+                <property name="HTTP_METHOD" scope="axis2" value="POST"/>
+                <property name="ContentType" scope="axis2" type="STRING" value="application/json"/>
+                <property name="messageType" scope="axis2" value="application/json"/>
+
+                <log level="custom">
+                    <property expression="$ctx:order_id" name="order_id"/>
+                    <property expression="$ctx:amount" name="amount"/>
+                    <property expression="$ctx:pay_token" name="pay_token"/>
+                    <property value="generated successfully" name="Web payment Status request" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </log>
+                <send receive="com.apigate.omoney.dbStatusUpdator">
+                    <endpoint key="nodeRedEnd"/>
+                </send>
+            </sequence>
+        </target>
+    </iterate>
+</sequence>

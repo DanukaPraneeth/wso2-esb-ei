@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.dbStatusUpdator" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="custom">
+        <property name="create_dbStatusUpdator_response" value="------------ dbStatusUpdator initiated -------------"/>
+    </log>
+
+    <property expression="json-eval($.status)" name="payment_status" scope="default" type="STRING"/>
+    <property expression="json-eval($.order_id)" name="order_id" scope="default" type="STRING"/>
+    <property expression="json-eval($.txnid)" name="txnid" scope="default" type="STRING"/>
+
+    <property expression="$ctx:counter + 1" name="new" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('payment_status') ='INITIATED' or get-property('payment_status') ='PENDING'">
+    <then>
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql><![CDATA[UPDATE OMONEY_LOG SET COUNTER = ? WHERE ORDER_ID = ?]]></sql>
+                    <parameter expression="$ctx:counter" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:order_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </statement>
+            </dbreport>
+
+
+            <log level="custom">
+                <parameter expression="$ctx:order_id" name="Payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$ctx:counter" name="db counter" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property value="completed successfully" name="Status not changed. db update"/>
+            </log>
+            <drop/>
+        </then>
+        <else>
+            <!-- Here Order ID is assumed to be unique -->
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql><![CDATA[UPDATE OMONEY_LOG SET STATUS = ?, TXNID = ?, COUNTER = ? WHERE ORDER_ID = ?]]></sql>
+                    <parameter expression="$ctx:payment_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:txnid" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:counter" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:order_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </statement>
+            </dbreport>
+
+
+            <log level="custom">
+                <property expression="$ctx:order_id" name="Payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:payment_status" name="Payment Status" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property value="completed successfully" name="Status changed. db update"/>
+            </log>
+
+            <drop/>
+        </else>
+    </filter>
+    <drop/>
+</sequence>

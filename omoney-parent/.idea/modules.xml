@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/com.apigate.omoney.capp/com.apigate.omoney.capp.iml" filepath="$PROJECT_DIR$/com.apigate.omoney.capp/com.apigate.omoney.capp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com.apigate.omoney.synapse/com.apigate.omoney.synapse.iml" filepath="$PROJECT_DIR$/com.apigate.omoney.synapse/com.apigate.omoney.synapse.iml" />
+      <module fileurl="file://$PROJECT_DIR$/omoney-parent.iml" filepath="$PROJECT_DIR$/omoney-parent.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.merchantStatusRequest" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="custom">
+        <property name="status" value="********** Payment Status Request Started*********"/>
+    </log>
+    <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="transactionstatus"/>
+
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS= ? ORDER BY ID DESC LIMIT 1 ]]></sql>
+            <parameter name="STATUS" value="ACTIVE" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <result column="ACCESS_TOKEN" name="access_token"/>
+        </statement>
+    </dblookup>
+    <log category="DEBUG" level="custom">
+        <property expression="$ctx:access_token" name="Access Token" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <property xmlns:ns="http://org.apache.synapse/xsd"
+              name="Authorization"
+              expression="fn:concat('Basic ', get-property('access_token'))"
+              scope="transport"/>
+
+    <log category="DEBUG" level="custom">
+        <property value="delivered" name="Web Payment Status request" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <call>
+        <endpoint key="nodeRedEnd"/>
+    </call>
+    <respond/>
+</sequence>

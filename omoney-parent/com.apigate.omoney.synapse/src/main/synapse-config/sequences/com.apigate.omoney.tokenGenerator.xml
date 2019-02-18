@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.tokenGenerator" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="custom">
+        <property name="query" value="*********** Initiated the token generation request *************"/>
+    </log>
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS = 'ACTIVE' ORDER BY ID DESC LIMIT 1 ]]></sql>
+            <result column="ACCESS_TOKEN" name="access_token"/>
+            <result column="ID" name="expired_id"/>
+            <result column="EXPIRE_TIME_MS" name="expire_time"/>
+            <result column="EXPIRES_IN" name="token_duration"/>
+        </statement>
+    </dblookup>
+    <property name="buffer" scope="default" type="STRING" value="432000000"/>
+    <property expression="$ctx:expire_time - $ctx:buffer" name="expire_limit" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:SYSTEM_TIME > $ctx:expire_limit" name="compareTime" xmlns:ns="http://org.apache.synapse/xsd"/>
+
+    <log level="custom">
+        <property expression="$ctx:expire_limit" name="Expire limit (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:SYSTEM_TIME" name="Server time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:expire_time" name="Expire time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:SYSTEM_TIME > $ctx:expire_time" name="Compare Time" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <filter regex="true" source="get-property('compareTime')" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="token"/>
+            <property expression="get-property('registry', 'conf:/omoney_config.xml')"
+                      name="xmlFile" scope="default" type="OM"/>
+            <property expression="$ctx:xmlFile//security/consumer_key" name="reg_consumer_key" scope="default" type="STRING"/>
+            <property expression="fn:concat('Basic ', get-property('reg_consumer_key'))"
+                      name="Authorization" scope="transport" type="STRING"/>
+            <property name="grant_type" scope="default" type="STRING" value="client_credentials"/>
+            <payloadFactory media-type="xml">
+                <format>
+                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                        <soapenv:Body>
+                            <root xmlns="">
+                                <grant_type>$1</grant_type>
+                            </root>
+                        </soapenv:Body>
+                    </soapenv:Envelope>
+                </format>
+                <args>
+                    <arg evaluator="xml" expression="$ctx:grant_type"/>
+                </args>
+            </payloadFactory>
+            <property name="messageType" scope="axis2" type="STRING" value="application/x-www-form-urlencoded"/>
+            <property name="DISABLE_CHUNKING" scope="axis2" type="STRING" value="true"/>
+            <log category="DEBUG" level="custom">
+                <property expression="get-property('reg_consumer_key')" name="key"/>
+            </log>
+            <log level="custom">
+                <property name="Service" value="Token expired. Generating a new Access Token"/>
+            </log>
+            <send receive="com.apigate.omoney.tokenResponse">
+                <endpoint key="nodeRedEnd"/>
+            </send>
+        </then>
+        <else>
+            <log level="custom">
+                <property name="Service" value="Token not expired"/>
+            </log>
+        </else>
+    </filter>
+</sequence>

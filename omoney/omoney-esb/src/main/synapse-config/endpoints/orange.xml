@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<endpoint name="orange" xmlns="http://ws.apache.org/ns/synapse">
-    <http method="post" uri-template="https://api.orange.com/orange-money-webpay/dev/v1/{uri.var.omoney_backend.name}"/>
-</endpoint>

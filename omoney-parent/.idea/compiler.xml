@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="com.apigate.omoney.capp" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="com.apigate.omoney.capp" target="1.5" />
+      <module name="com.apigate.omoney.synapse" target="1.5" />
+      <module name="omoney-parent" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
