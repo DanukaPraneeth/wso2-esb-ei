@@ -6,10 +6,12 @@
 
     <property expression="json-eval($.pay_token)" name="pay_token" scope="default" type="STRING"/>
     <property expression="json-eval($.notif_token)" name="notif_token" scope="default" type="STRING"/>
+
     <log level="custom">
         <property expression="$ctx:pay_token" name="Orange Pay Token" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="$ctx:notif_token" name="Orange notif token" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
+
     <dbreport>
         <connection>
             <pool>
@@ -24,7 +26,7 @@
         </statement>
     </dbreport>
 
-    <log category="DEBUG" level="custom">
-        <property value="completed successfully" name="Web payment Orange response database update" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <log level="custom">
+        <property value="completed successfully" name="database update for Web payment Orange responsesss " xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 </sequence>

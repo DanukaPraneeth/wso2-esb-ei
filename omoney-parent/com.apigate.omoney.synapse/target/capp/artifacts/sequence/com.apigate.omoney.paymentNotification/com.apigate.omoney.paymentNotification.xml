@@ -19,9 +19,9 @@
         </connection>
         <statement>
             <sql><![CDATA[UPDATE OMONEY_LOG SET STATUS = ?, TXNID = ? WHERE NOTIFY_TOKEN = ?]]></sql>
-            <parameter expression="get-property('payment_status')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="get-property('txnid')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="get-property('notif_token')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:payment_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:txnid" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
 
@@ -33,7 +33,7 @@
         </connection>
         <statement>
             <sql><![CDATA[ SELECT NOTIFY_URL FROM OMONEY_LOG WHERE NOTIFY_TOKEN= ? ]]></sql>
-            <parameter expression="get-property('notif_token')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
             <result column="NOTIFY_URL" name="notify_url"/>
         </statement>
     </dblookup>

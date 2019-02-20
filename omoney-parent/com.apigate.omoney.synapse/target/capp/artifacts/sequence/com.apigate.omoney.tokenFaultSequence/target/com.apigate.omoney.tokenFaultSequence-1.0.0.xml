@@ -5,7 +5,7 @@
         <property expression="get-property('ERROR_MESSAGE')" name="ERROR_MESSAGE"/>
     </log>
     <payloadFactory media-type="json">
-        <format>{​ "Status":"Error Occurred While Processing the Request",
+        <format>{​ "Status":"Error Occurred While Processing the Token Generation Request",
             "Message":"$1"}
         </format>
         <args>

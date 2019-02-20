@@ -1,0 +1,14 @@
+<customConfigs>
+	<merchant_key>a86b2087</merchant_key>
+	<security>
+		<consumer_key>R1lVOU1rbjhtSGZZUmh4UmtBNW5nQUphSEJSRGJmRzI6aTA1REFqUEFHSkp2OHBFMQ==</consumer_key>
+		<token_buffer>1</token_buffer>		<!-- This is the buffer no of days to regenerate the token -->
+	</security>
+	<endPoints>
+		<notify>https://api.bizao.com/auth/v1/mm/sp/notify</notify>
+	</endPoints>
+	<status_request>
+		<batch_size>100</batch_size>
+		<retry_period>4</retry_period>	<!-- This is the look back period in hours to select the 'pending' transaction list -->
+	</status_request>
+</customConfigs>

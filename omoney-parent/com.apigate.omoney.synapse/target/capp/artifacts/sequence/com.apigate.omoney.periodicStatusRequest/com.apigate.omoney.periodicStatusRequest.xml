@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sequence name="com.apigate.omoney.periodicStatusRequest" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<sequence name="com.apigate.omoney.periodicStatusRequest" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
     <log level="custom">
-        <property name="query" value="*********** starting the db update *************"/>
+        <property name="query" value="*********** starting the periodic status update *************"/>
     </log>
+
+    <property expression="get-property('registry', 'conf:/repository/wso2telco/configurations/omoneyConfig.xml')"
+              name="xmlFile" scope="default" type="OM"/>
+    <property expression="$ctx:xmlFile//status_request/batch_size" name="batch_size" scope="default" type="STRING"/>
+    <property expression="$ctx:xmlFile//status_request/retry_period" name="retry_period" scope="default" type="STRING"/>
+
+
     <dblookup>
         <connection>
             <pool>
@@ -16,9 +23,14 @@
         </statement>
     </dblookup>
 
-    <property name="SELECT_QUERY" value="SELECT ORDER_ID, AMOUNT, PAY_TOKEN, STATUS, COUNTER FROM OMONEY_LOG WHERE (STATUS='INITIATED' OR STATUS='PENDING') AND 5 > COUNTER AND LOGGED_TIME >= NOW() - INTERVAL 4 HOUR"/>
+    <property name="sql_1" value="SELECT ORDER_ID, AMOUNT, PAY_TOKEN, STATUS, COUNTER FROM OMONEY_LOG WHERE (STATUS='INITIATED' OR STATUS='PENDING') AND 5 > COUNTER AND LOGGED_TIME >= NOW() - INTERVAL "/>
+    <property name="sql_2" value=" HOUR ORDER BY LOGGED_TIME ASC LIMIT "/>
+    <property expression="fn:concat($ctx:sql_1, $ctx:retry_period, $ctx:sql_2, $ctx:batch_size)"
+              name="SELECT_QUERY" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+
     <property name="SELECT_QUERY_ENRICH_BODY" scope="default" type="STRING" value="true"/>
     <class name="com.wso2telco.dep.common.mediation.SelectQueryExecutingMediator"/>
+
     <log level="custom">
         <property expression="count(//RESULT_ARRAY)" name="db query result count for status request" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>

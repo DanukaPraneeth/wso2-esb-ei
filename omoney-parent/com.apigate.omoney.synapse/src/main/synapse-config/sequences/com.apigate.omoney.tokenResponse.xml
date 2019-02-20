@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sequence name="com.apigate.omoney.tokenResponse" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<sequence name="com.apigate.omoney.tokenResponse" onError="com.apigate.omoney.tokenFaultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
     <log level="custom">
         <property name="query" value="*********** Outsequence of token generation request *************"/>
     </log>
@@ -37,10 +37,10 @@
         </connection>
         <statement>
             <sql><![CDATA[ UPDATE OMONEY_KEYS SET STATUS = 'EXPIRED' WHERE ID = ? ]]></sql>
-            <parameter expression="$ctx:expired_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:last_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
-    <log category="DEBUG" level="custom">
+    <log level="custom">
         <property expression="$ctx:access_token" name="New Access Token"/>
         <property name="Successful" value="Data base update"/>
     </log>

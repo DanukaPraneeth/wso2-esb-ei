@@ -11,6 +11,19 @@
     <property name="HTTP_SC" value="204" scope="axis2"/>
     <property name="FORCE_SC_ACCEPTED" value="true" scope="axis2" />
 
+
+
+
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('payment_status') ='INITIATED' or get-property('payment_status') ='PENDING'">
+        <then>
+
+        </then>
+        <else>
+
+        </else>
+    </filter>
+
+
     <dbreport>
         <connection>
             <pool>
@@ -19,11 +32,19 @@
         </connection>
         <statement>
             <sql><![CDATA[UPDATE OMONEY_LOG SET STATUS = ?, TXNID = ? WHERE NOTIFY_TOKEN = ?]]></sql>
-            <parameter expression="get-property('payment_status')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="get-property('txnid')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="get-property('notif_token')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:payment_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:txnid" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
+
+
+
+
+
+
+
+
 
     <dblookup>
         <connection>
@@ -33,13 +54,17 @@
         </connection>
         <statement>
             <sql><![CDATA[ SELECT NOTIFY_URL FROM OMONEY_LOG WHERE NOTIFY_TOKEN= ? ]]></sql>
-            <parameter expression="get-property('notif_token')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <parameter expression="$ctx:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
             <result column="NOTIFY_URL" name="notify_url"/>
         </statement>
     </dblookup>
 
     <property name="uri.var.merchant.notif.endpoint" scope="default" type="STRING" expression="get-property('notify_url')"/>
     <property name="OUT_ONLY" scope="default" type="STRING" value="true"/>
+
+    <log level="custom">
+        <property value="delivered to the merchant" name="Web payment notification "/>
+    </log>
 
     <send>
         <endpoint key="merchantEnd"/>

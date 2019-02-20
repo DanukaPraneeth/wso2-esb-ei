@@ -17,7 +17,7 @@
             <result column="ACCESS_TOKEN" name="access_token"/>
         </statement>
     </dblookup>
-    <log category="DEBUG" level="custom">
+    <log level="custom">
         <property expression="$ctx:access_token" name="Access Token" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 
@@ -26,11 +26,14 @@
               expression="fn:concat('Basic ', get-property('access_token'))"
               scope="transport"/>
 
-    <log category="DEBUG" level="custom">
+    <log level="custom">
         <property value="delivered" name="Web Payment Status request" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
     <call>
         <endpoint key="nodeRedEnd"/>
     </call>
+    <log level="custom">
+        <property value="delivered" name="Web Payment Status recieved. Merchant respond" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
     <respond/>
 </sequence>

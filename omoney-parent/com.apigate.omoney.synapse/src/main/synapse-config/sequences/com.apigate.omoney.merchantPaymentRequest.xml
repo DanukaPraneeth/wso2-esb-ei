@@ -7,7 +7,6 @@
 
     <property expression="get-property('registry', 'conf:/omoney_config.xml')" name="xmlFile" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
     <property expression="$ctx:xmlFile//merchant_key" name="reg_merchant_key" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property expression="$ctx:xmlFile//security/consumer_key" name="reg_consumer_key" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
     <property expression="$ctx:xmlFile//endPoints/notify" name="reg_notify" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
 
     <property expression="json-eval($.)" name="payload" scope="default" type="STRING"/>
@@ -19,9 +18,11 @@
     <property expression="json-eval($.notif_url)" name="notif_url" scope="default" type="STRING"/>
 
     <log level="custom">
+        <property name="recieved" value="New web payment request "/>
         <property expression="$ctx:order_id" name="payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="$ctx:amount" name="payment amount" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
+
     <dbreport>
         <connection>
             <pool>
@@ -39,6 +40,7 @@
             <parameter expression="$ctx:payload" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
         </statement>
     </dbreport>
+
     <dblookup>
         <connection>
             <pool>
@@ -51,7 +53,8 @@
             <result column="ACCESS_TOKEN" name="access_token"/>
         </statement>
     </dblookup>
-    <log category="DEBUG" level="custom">
+
+    <log level="custom">
         <property expression="$ctx:access_token" name="active access token" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 
@@ -78,7 +81,8 @@
         <source clone="true" xmlns:ns="http://org.apache.synapse/xsd" xpath="//jsonObject"/>
         <target type="body"/>
     </enrich>
-    <log category="DEBUG" level="custom">
+
+    <log level="custom">
         <property value="completed successfully" name="Web payment database update" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
     <send>

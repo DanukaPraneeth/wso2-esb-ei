@@ -4,14 +4,14 @@
         <property name="create_dbStatusUpdator_response" value="------------ dbStatusUpdator initiated -------------"/>
     </log>
 
-    <property expression="json-eval($.status)" name="payment_status" scope="default" type="STRING"/>
-    <property expression="json-eval($.order_id)" name="order_id" scope="default" type="STRING"/>
+    <property expression="json-eval($.status)" name="latest_status" scope="default" type="STRING"/>
+    <property expression="json-eval($.order_id)" name="order_ID" scope="default" type="STRING"/>
     <property expression="json-eval($.txnid)" name="txnid" scope="default" type="STRING"/>
 
-    <property expression="$ctx:counter + 1" name="new" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:counter + 1" name="counter" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
 
-    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('payment_status') ='INITIATED' or get-property('payment_status') ='PENDING'">
-    <then>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('latest_status') ='INITIATED' or get-property('latest_status') ='PENDING'">
+        <then>
             <dbreport>
                 <connection>
                     <pool>
@@ -21,15 +21,15 @@
                 <statement>
                     <sql><![CDATA[UPDATE OMONEY_LOG SET COUNTER = ? WHERE ORDER_ID = ?]]></sql>
                     <parameter expression="$ctx:counter" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-                    <parameter expression="$ctx:order_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:order_ID" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
                 </statement>
             </dbreport>
 
-
             <log level="custom">
-                <parameter expression="$ctx:order_id" name="Payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
-                <parameter expression="$ctx:counter" name="db counter" xmlns:ns="http://org.apache.synapse/xsd"/>
-                <property value="completed successfully" name="Status not changed. db update"/>
+                <property expression="$ctx:order_ID" name="Payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:latest_status" name="Payment Status" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:counter" name="Status Counter" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property value="completed successfully" name="Status not changed. db counter update"/>
             </log>
             <drop/>
         </then>
@@ -43,17 +43,17 @@
                 </connection>
                 <statement>
                     <sql><![CDATA[UPDATE OMONEY_LOG SET STATUS = ?, TXNID = ?, COUNTER = ? WHERE ORDER_ID = ?]]></sql>
-                    <parameter expression="$ctx:payment_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:latest_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
                     <parameter expression="$ctx:txnid" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
                     <parameter expression="$ctx:counter" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-                    <parameter expression="$ctx:order_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:order_ID" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
                 </statement>
             </dbreport>
 
-
             <log level="custom">
-                <property expression="$ctx:order_id" name="Payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
-                <property expression="$ctx:payment_status" name="Payment Status" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:order_ID" name="Payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:latest_status" name="Payment Status" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:counter" name="Status Counter" xmlns:ns="http://org.apache.synapse/xsd"/>
                 <property value="completed successfully" name="Status changed. db update"/>
             </log>
 
