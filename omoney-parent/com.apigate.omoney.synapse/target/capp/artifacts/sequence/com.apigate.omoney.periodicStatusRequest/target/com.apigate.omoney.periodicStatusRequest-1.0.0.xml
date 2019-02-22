@@ -60,11 +60,11 @@
                 <property name="ContentType" scope="axis2" type="STRING" value="application/json"/>
                 <property name="messageType" scope="axis2" value="application/json"/>
 
-                <log level="custom">
+                <log category="DEBUG" level="custom">
                     <property expression="$ctx:order_id" name="order_id"/>
                     <property expression="$ctx:amount" name="amount"/>
                     <property expression="$ctx:pay_token" name="pay_token"/>
-                    <property value="generated successfully" name="Web payment Status request" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <property expression="$ctx:notif_token" name="notif_token"/>
                 </log>
                 <send receive="com.apigate.omoney.periodicStatusResponse">
                     <endpoint key="nodeRedEnd"/>

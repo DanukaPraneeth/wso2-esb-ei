@@ -64,6 +64,7 @@
                     <property expression="$ctx:order_id" name="order_id"/>
                     <property expression="$ctx:amount" name="amount"/>
                     <property expression="$ctx:pay_token" name="pay_token"/>
+                    <property expression="$ctx:notif_token" name="notif_token"/>
                 </log>
                 <send receive="com.apigate.omoney.periodicStatusResponse">
                     <endpoint key="nodeRedEnd"/>

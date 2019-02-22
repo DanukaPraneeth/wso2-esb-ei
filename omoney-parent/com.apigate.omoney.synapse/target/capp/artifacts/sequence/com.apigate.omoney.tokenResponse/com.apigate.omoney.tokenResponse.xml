@@ -46,7 +46,7 @@
                 </statement>
             </dbreport>
 
-            <log level="custom">
+            <log category="DEBUG" level="custom">
                 <property expression="$ctx:access_token" name="Access Token"/>
                 <property name="Successful" value="Data base update"/>
             </log>

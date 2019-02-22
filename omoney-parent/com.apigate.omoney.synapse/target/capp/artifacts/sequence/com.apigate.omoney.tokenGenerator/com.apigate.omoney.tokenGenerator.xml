@@ -27,11 +27,14 @@
 
     <log level="custom">
         <property name="Starting" value="Orange token validity check"/>
-        <property expression="$ctx:expire_time" name="Expire time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
-        <property expression="$ctx:buffer" name="Buffer time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:compareTime" name="Token Expired" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <log category="DEBUG" level="custom">
+        <property expression="$ctx:expire_time" name="Actual Expire time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:buffer" name="Expire Buffer (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="$ctx:expire_limit" name="Expire limit (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="get-property('SYSTEM_TIME')" name="Server time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
-        <property expression="$ctx:compareTime" name="Time Compare Result" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 
     <filter regex="true" source="get-property('compareTime')" xmlns:ns="http://org.apache.synapse/xsd">
@@ -71,4 +74,5 @@
             </log>
         </else>
     </filter>
+    <drop/>
 </sequence>

@@ -12,7 +12,6 @@
     <module>artifacts/api/omoneyAPI</module>
     <module>artifacts/sequence/com.apigate.omoney.faultSequence</module>
     <module>artifacts/sequence/com.apigate.omoney.tokenFaultSequence</module>
-    <module>artifacts/sequence/com.apigate.omoney.dbStatusUpdator</module>
     <module>artifacts/sequence/com.apigate.omoney.merchantPaymentRequest</module>
     <module>artifacts/sequence/com.apigate.omoney.merchantPaymentResponse</module>
     <module>artifacts/sequence/com.apigate.omoney.paymentNotification</module>
@@ -27,5 +26,6 @@
     <module>artifacts/template/com.apigate.omoney.merchantPayment.Template</module>
     <module>artifacts/template/com.apigate.omoney.paymentStatus.Template</module>
     <module>artifacts/template/com.apigate.omoney.getAccessToken.Template</module>
+    <module>artifacts/template/com.apigate.omoney.errorResponse.Template</module>
   </modules>
 </project>

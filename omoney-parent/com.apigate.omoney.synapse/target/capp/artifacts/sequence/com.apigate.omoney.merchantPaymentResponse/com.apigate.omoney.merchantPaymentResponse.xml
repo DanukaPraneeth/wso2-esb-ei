@@ -3,9 +3,8 @@
 
     <property expression="$axis2:HTTP_SC" name="http_status" xmlns:ns="http://org.apache.synapse/xsd"/>
 
-    <filter regex="403" source="$ctx:http_status" xmlns:ns="http://org.apache.synapse/xsd">
-        <then>
-
+    <switch source="$ctx:http_status" xmlns:ns="http://org.apache.synapse/xsd">
+        <case regex="403">
             <property value="NULL" name="pay_token" scope="default" type="STRING"/>
             <property value="NULL" name="notif_token" scope="default" type="STRING"/>
             <property value="NULL" name="message" scope="default" type="STRING"/>
@@ -29,9 +28,8 @@
                 <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
                 <property value="Error during Web payment" name="Transaction result" xmlns:ns="http://org.apache.synapse/xsd"/>
             </log>
-
-        </then>
-        <else>
+        </case>
+        <case regex="201">
             <property expression="json-eval($.pay_token)" name="pay_token" scope="default" type="STRING"/>
             <property expression="json-eval($.notif_token)" name="notif_token" scope="default" type="STRING"/>
             <property expression="json-eval($.message)" name="message" scope="default" type="STRING"/>
@@ -51,14 +49,24 @@
                 <with-param name="http_status" value="{get-property('http_status')}" xmlns:ns="http://org.apache.synapse/xsd"/>
             </call-template>
 
-            <log level="custom">
-                <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <log category="DEBUG" level="custom">
                 <property expression="$ctx:pay_token" name="Orange Pay Token" xmlns:ns="http://org.apache.synapse/xsd"/>
                 <property expression="$ctx:notif_token" name="Orange notif token" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+            <log level="custom">
+                <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
                 <property expression="$ctx:message" name="Message" xmlns:ns="http://org.apache.synapse/xsd"/>
                 <property value="Web Payment Successful" name="Transaction result" xmlns:ns="http://org.apache.synapse/xsd"/>
             </log>
+        </case>
+        <default>
+            <log level="custom">
+                <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property value="Error during Web payment" name="Transaction result" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+            <call-template target="com.apigate.omoney.errorResponse.Template"/>
 
-        </else>
-    </filter>
+        </default>
+    </switch>
+
 </sequence>

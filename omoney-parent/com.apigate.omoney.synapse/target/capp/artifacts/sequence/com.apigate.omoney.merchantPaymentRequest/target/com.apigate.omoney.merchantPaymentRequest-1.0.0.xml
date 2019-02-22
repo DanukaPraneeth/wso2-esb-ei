@@ -15,6 +15,7 @@
     <property expression="json-eval($.reference)" name="reference" scope="default" type="STRING"/>
     <property expression="json-eval($.notif_url)" name="notif_url" scope="default" type="STRING"/>
 
+
     <log level="custom">
         <property name="received" value="New web payment request "/>
         <property expression="$ctx:order_id" name="payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>

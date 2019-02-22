@@ -8,9 +8,6 @@
     <artifact name="com.apigate.omoney.tokenFaultSequence" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
         <file>src/main/synapse-config/sequences/com.apigate.omoney.tokenFaultSequence.xml</file>
     </artifact>
-    <artifact name="com.apigate.omoney.dbStatusUpdator" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
-        <file>src/main/synapse-config/sequences/com.apigate.omoney.dbStatusUpdator.xml</file>
-    </artifact>
     <artifact name="com.apigate.omoney.merchantPaymentRequest" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
         <file>src/main/synapse-config/sequences/com.apigate.omoney.merchantPaymentRequest.xml</file>
     </artifact>
@@ -52,5 +49,8 @@
     </artifact>
     <artifact name="com.apigate.omoney.periodicStatusResponse" groupId="com.example.com.apigate.omoney.synapse.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
         <file>src/main/synapse-config/sequences/com.apigate.omoney.periodicStatusResponse.xml</file>
+    </artifact>
+    <artifact name="com.apigate.omoney.errorResponse.Template" groupId="com.example.com.apigate.omoney.synapse.template" version="1.0.0" type="synapse/sequenceTemplate" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/templates/com.apigate.omoney.errorResponse.Template.xml</file>
     </artifact>
 </artifacts>
