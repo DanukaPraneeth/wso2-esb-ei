@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="com.apigate.omoney.tokenGenerator" onError="com.apigate.omoney.tokenFaultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="custom">
-        <property name="query" value="*********** Initiated the token generation request *************"/>
-    </log>
 
     <property expression="get-property('registry', 'conf:/repository/wso2telco/configurations/omoneyConfig.xml')"
               name="xmlFile" scope="default" type="OM"/>
@@ -29,6 +26,7 @@
     <property expression="get-property('SYSTEM_TIME') > $ctx:expire_limit" name="compareTime" xmlns:ns="http://org.apache.synapse/xsd"/>
 
     <log level="custom">
+        <property name="Starting" value="Orange token validity check"/>
         <property expression="$ctx:expire_time" name="Expire time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="$ctx:buffer" name="Buffer time (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="$ctx:expire_limit" name="Expire limit (ms)" xmlns:ns="http://org.apache.synapse/xsd"/>

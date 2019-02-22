@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="com.apigate.omoney.merchantPayment.Template" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="order_id"/>
+    <parameter name="currency"/>
+    <parameter name="amount"/>
+    <parameter name="language"/>
+    <parameter name="reference"/>
+    <parameter name="notif_url"/>
+    <parameter name="status"/>
+    <parameter name="payload"/>
+    <parameter name="pay_token"/>
+    <parameter name="notif_token"/>
+    <parameter name="http_status"/>
+
+    <sequence>
+
+        <dbreport>
+            <connection>
+                <pool>
+                    <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                </pool>
+            </connection>
+            <statement>
+                <sql><![CDATA[insert into OMONEY_LOG (ORDER_ID, CURRENCY, AMOUNT, LANG, REFERENCE, NOTIFY_URL, STATUS, PAYLOAD, PAY_TOKEN, NOTIFY_TOKEN, HTTP_CODE) values ( ?,?,?,?,?,?,?,?,?,?,? )]]></sql>
+                <parameter expression="$func:order_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:currency" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:amount" type="FLOAT" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:language" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:reference" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:notif_url" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:payload" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:pay_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <parameter expression="$func:http_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </statement>
+        </dbreport>
+        <log category="DEBUG" level="custom">
+            <property expression="$ctx:order_id" name="Order id" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <property value="database update Successful" name="New web payment" xmlns:ns="http://org.apache.synapse/xsd"/>
+        </log>
+
+    </sequence>
+
+</template>

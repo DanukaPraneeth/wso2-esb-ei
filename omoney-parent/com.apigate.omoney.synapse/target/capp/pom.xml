@@ -20,8 +20,12 @@
     <module>artifacts/sequence/com.apigate.omoney.tokenGenerator</module>
     <module>artifacts/sequence/com.apigate.omoney.tokenResponse</module>
     <module>artifacts/sequence/com.apigate.omoney.merchantStatusRequest</module>
+    <module>artifacts/sequence/com.apigate.omoney.periodicStatusResponse</module>
     <module>artifacts/endpoint/merchantEnd</module>
     <module>artifacts/endpoint/orangeEnd</module>
     <module>artifacts/endpoint/nodeRedEnd</module>
+    <module>artifacts/template/com.apigate.omoney.merchantPayment.Template</module>
+    <module>artifacts/template/com.apigate.omoney.paymentStatus.Template</module>
+    <module>artifacts/template/com.apigate.omoney.getAccessToken.Template</module>
   </modules>
 </project>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="com.apigate.omoney.paymentNotification" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="full">
-        <property name="query" value="*********** recieved the web payment notification *************"/>
+    <log level="custom">
+        <property name="received" value="Web payment notification"/>
     </log>
 
     <property expression="json-eval($.status)" name="payment_status" scope="default" type="STRING"/>
@@ -11,41 +11,6 @@
     <property name="HTTP_SC" value="204" scope="axis2"/>
     <property name="FORCE_SC_ACCEPTED" value="true" scope="axis2" />
 
-
-
-
-    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('payment_status') ='INITIATED' or get-property('payment_status') ='PENDING'">
-        <then>
-
-        </then>
-        <else>
-
-        </else>
-    </filter>
-
-
-    <dbreport>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[UPDATE OMONEY_LOG SET STATUS = ?, TXNID = ? WHERE NOTIFY_TOKEN = ?]]></sql>
-            <parameter expression="$ctx:payment_status" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:txnid" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-        </statement>
-    </dbreport>
-
-
-
-
-
-
-
-
-
     <dblookup>
         <connection>
             <pool>
@@ -53,11 +18,38 @@
             </pool>
         </connection>
         <statement>
-            <sql><![CDATA[ SELECT NOTIFY_URL FROM OMONEY_LOG WHERE NOTIFY_TOKEN= ? ]]></sql>
+            <sql><![CDATA[ SELECT STATUS, NOTIFY_URL, COUNTER FROM OMONEY_LOG WHERE NOTIFY_TOKEN= ? ]]></sql>
             <parameter expression="$ctx:notif_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <result column="STATUS" name="db_status"/>
             <result column="NOTIFY_URL" name="notify_url"/>
+            <result column="COUNTER" name="counter"/>
         </statement>
     </dblookup>
+
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('db_status') ='INITIATED' or get-property('db_status') ='PENDING'">
+        <then>
+            <call-template target="com.apigate.omoney.paymentStatus.Template">
+                <with-param name="payment_status" value="{get-property('payment_status')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="txnid" value="{get-property('txnid')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="counter" value="{get-property('counter')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="notif_token" value="{get-property('notif_token')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </call-template>
+            <log level="custom">
+                <property value="updated on database" name="Payment Status"/>
+                <property expression="$ctx:payment_status" name="Status" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:notif_token" name="Notif Token" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:txnid" name="Txnid" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+        </then>
+        <else>
+            <log level="custom">
+                <property value="already updated on database" name="Payment Status"/>
+                <property expression="$ctx:payment_status" name="Status" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:notif_token" name="Notif Token" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:txnid" name="Txnid" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+        </else>
+    </filter>
 
     <property name="uri.var.merchant.notif.endpoint" scope="default" type="STRING" expression="get-property('notify_url')"/>
     <property name="OUT_ONLY" scope="default" type="STRING" value="true"/>

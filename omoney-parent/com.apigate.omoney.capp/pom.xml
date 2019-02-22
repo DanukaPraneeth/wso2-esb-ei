@@ -14,21 +14,25 @@
   <name>com.apigate.omoney.capp</name>
   <description>com.apigate.omoney.capp</description>
   <properties>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenGenerator>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenGenerator>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.paymentNotification>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.paymentNotification>
-    <artifact.types>jaggery/app=zip,synapse/priority-executor=xml,synapse/inbound-endpoint=xml,service/rule=aar,synapse/message-store=xml,event/stream=json,service/meta=xml,datasource/datasource=xml,synapse/proxy-service=xml,bpel/workflow=zip,synapse/sequence=xml,synapse/endpointTemplate=xml,carbon/application=car,wso2/gadget=dar,synapse/api=xml,synapse/event-source=xml,synapse/message-processors=xml,event/receiver=xml,lib/dataservice/validator=jar,synapse/template=xml,synapse/endpoint=xml,lib/carbon/ui=jar,lib/synapse/mediator=jar,event/publisher=xml,synapse/local-entry=xml,synapse/task=xml,webapp/jaxws=war,registry/resource=zip,synapse/configuration=xml,service/axis2=aar,synapse/lib=zip,synapse/sequenceTemplate=xml,event/execution-plan=siddhiql,service/dataservice=dbs,web/application=war,lib/library/bundle=jar</artifact.types>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.dbStatusUpdator>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.dbStatusUpdator>
     <com.example.com.apigate.omoney.synapse.endpoint_._orangeEnd>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.endpoint_._orangeEnd>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenGenerator>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenGenerator>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenFaultSequence>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenFaultSequence>
+    <com.example.com.apigate.omoney.synapse.endpoint_._nodeRedEnd>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.endpoint_._nodeRedEnd>
+    <com.example.com.apigate.omoney.synapse.template_._com.apigate.omoney.paymentStatus.Template>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.template_._com.apigate.omoney.paymentStatus.Template>
     <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantStatusRequest>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantStatusRequest>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.paymentNotification>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.paymentNotification>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.periodicStatusResponse>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.periodicStatusResponse>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentResponse>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentResponse>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.faultSequence>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.faultSequence>
+    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentRequest>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentRequest>
+    <com.example.com.apigate.omoney.synapse.template_._com.apigate.omoney.getAccessToken.Template>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.template_._com.apigate.omoney.getAccessToken.Template>
     <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.periodicStatusRequest>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.periodicStatusRequest>
     <com.example.com.apigate.omoney.synapse.api_._omoneyAPI>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.api_._omoneyAPI>
+    <artifact.types>jaggery/app=zip,synapse/priority-executor=xml,synapse/inbound-endpoint=xml,service/rule=aar,synapse/message-store=xml,event/stream=json,service/meta=xml,datasource/datasource=xml,synapse/proxy-service=xml,bpel/workflow=zip,synapse/sequence=xml,synapse/endpointTemplate=xml,carbon/application=car,wso2/gadget=dar,synapse/api=xml,synapse/event-source=xml,synapse/message-processors=xml,event/receiver=xml,lib/dataservice/validator=jar,synapse/template=xml,synapse/endpoint=xml,lib/carbon/ui=jar,lib/synapse/mediator=jar,event/publisher=xml,synapse/local-entry=xml,synapse/task=xml,webapp/jaxws=war,registry/resource=zip,synapse/configuration=xml,service/axis2=aar,synapse/lib=zip,synapse/sequenceTemplate=xml,event/execution-plan=siddhiql,service/dataservice=dbs,web/application=war,lib/library/bundle=jar</artifact.types>
     <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenResponse>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenResponse>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentRequest>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentRequest>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentResponse>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.merchantPaymentResponse>
     <com.example.com.apigate.omoney.synapse.endpoint_._merchantEnd>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.endpoint_._merchantEnd>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.faultSequence>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.faultSequence>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.dbStatusUpdator>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.dbStatusUpdator>
-    <com.example.com.apigate.omoney.synapse.endpoint_._nodeRedEnd>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.endpoint_._nodeRedEnd>
-    <com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenFaultSequence>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.sequence_._com.apigate.omoney.tokenFaultSequence>
+    <com.example.com.apigate.omoney.synapse.template_._com.apigate.omoney.merchantPayment.Template>capp/EnterpriseServiceBus</com.example.com.apigate.omoney.synapse.template_._com.apigate.omoney.merchantPayment.Template>
   </properties>
   <dependencies>
     <dependency>
@@ -112,6 +116,30 @@
     <dependency>
       <groupId>com.example.com.apigate.omoney.synapse.sequence</groupId>
       <artifactId>com.apigate.omoney.merchantStatusRequest</artifactId>
+      <version>1.0.0</version>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>com.example.com.apigate.omoney.synapse.template</groupId>
+      <artifactId>com.apigate.omoney.merchantPayment.Template</artifactId>
+      <version>1.0.0</version>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>com.example.com.apigate.omoney.synapse.template</groupId>
+      <artifactId>com.apigate.omoney.paymentStatus.Template</artifactId>
+      <version>1.0.0</version>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>com.example.com.apigate.omoney.synapse.template</groupId>
+      <artifactId>com.apigate.omoney.getAccessToken.Template</artifactId>
+      <version>1.0.0</version>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>com.example.com.apigate.omoney.synapse.sequence</groupId>
+      <artifactId>com.apigate.omoney.periodicStatusResponse</artifactId>
       <version>1.0.0</version>
       <type>xml</type>
     </dependency>

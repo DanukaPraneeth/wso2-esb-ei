@@ -1,48 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="com.apigate.omoney.tokenResponse" onError="com.apigate.omoney.tokenFaultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="custom">
-        <property name="query" value="*********** Outsequence of token generation request *************"/>
-    </log>
-    <property expression="json-eval($.access_token)" name="access_token"
-              scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property expression="json-eval($.expires_in)" name="token_duration"
-              scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property expression="get-property('token_duration') * 1000"
-              name="access_duration_ms" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property expression="get-property('SYSTEM_TIME')" name="log_time"
-              scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <property expression="get-property('log_time') + get-property('access_duration_ms')"
-            name="expire_time" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
-    <log level="custom"/>
-    <dbreport>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[INSERT INTO OMONEY_KEYS (ACCESS_TOKEN, STATUS, EXPIRES_IN, LOGGED_TIME_MS, EXPIRE_TIME_MS ) VALUES ( ?,?,?,?,? )]]></sql>
-            <parameter expression="$ctx:access_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter type="VARCHAR" value="ACTIVE"/>
-            <parameter expression="$ctx:token_duration" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:log_time" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:expire_time" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-        </statement>
-    </dbreport>
-    <dbreport>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[ UPDATE OMONEY_KEYS SET STATUS = 'EXPIRED' WHERE ID = ? ]]></sql>
-            <parameter expression="$ctx:last_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-        </statement>
-    </dbreport>
-    <log level="custom">
-        <property expression="$ctx:access_token" name="New Access Token"/>
-        <property name="Successful" value="Data base update"/>
-    </log>
+
+    <property expression="$axis2:HTTP_SC" name="http_status" xmlns:ns="http://org.apache.synapse/xsd"/>
+
+    <filter regex="200" source="$ctx:http_status" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <log level="custom">
+                <property value="Successful" name="New Access Token Generation"/>
+            </log>
+            <property expression="json-eval($.access_token)" name="access_token"
+                      scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <property expression="json-eval($.expires_in)" name="token_duration"
+                      scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <property expression="get-property('token_duration') * 1000"
+                      name="access_duration_ms" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <property expression="get-property('SYSTEM_TIME')" name="log_time"
+                      scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <property expression="get-property('log_time') + get-property('access_duration_ms')"
+                      name="expire_time" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql><![CDATA[INSERT INTO OMONEY_KEYS (ACCESS_TOKEN, STATUS, EXPIRES_IN, LOGGED_TIME_MS, EXPIRE_TIME_MS ) VALUES ( ?,?,?,?,? )]]></sql>
+                    <parameter expression="$ctx:access_token" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter type="VARCHAR" value="ACTIVE"/>
+                    <parameter expression="$ctx:token_duration" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:log_time" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                    <parameter expression="$ctx:expire_time" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </statement>
+            </dbreport>
+
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql><![CDATA[ UPDATE OMONEY_KEYS SET STATUS = 'EXPIRED' WHERE ID = ? ]]></sql>
+                    <parameter expression="$ctx:last_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </statement>
+            </dbreport>
+
+            <log level="custom">
+                <property expression="$ctx:access_token" name="Access Token"/>
+                <property name="Successful" value="Data base update"/>
+            </log>
+
+        </then>
+        <else>
+            <log level="custom">
+                <property value="Error during token generation" name="Token regeneration" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+        </else>
+    </filter>
+
     <drop/>
 </sequence>

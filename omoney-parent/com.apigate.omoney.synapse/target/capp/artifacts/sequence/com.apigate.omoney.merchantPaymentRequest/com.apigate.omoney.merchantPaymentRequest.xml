@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="com.apigate.omoney.merchantPaymentRequest" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="custom">
-        <property name="query" value="*********** recieved the web payment request *************"/>
-    </log>
+
     <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="webpayment"/>
 
     <property expression="get-property('registry', 'conf:/omoney_config.xml')" name="xmlFile" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
@@ -18,49 +16,22 @@
     <property expression="json-eval($.notif_url)" name="notif_url" scope="default" type="STRING"/>
 
     <log level="custom">
-        <property name="recieved" value="New web payment request "/>
+        <property name="received" value="New web payment request "/>
         <property expression="$ctx:order_id" name="payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
         <property expression="$ctx:amount" name="payment amount" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 
-    <dbreport>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[insert into OMONEY_LOG (ORDER_ID, CURRENCY, AMOUNT, LANG, REFERENCE, NOTIFY_URL, PAYLOAD) values ( ?,?,?,?,?,?,? )]]></sql>
-            <parameter expression="$ctx:order_id" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:currency" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:amount" type="FLOAT" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:language" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:reference" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:notif_url" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="$ctx:payload" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-        </statement>
-    </dbreport>
 
-    <dblookup>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS= ? ORDER BY ID DESC LIMIT 1 ]]></sql>
-            <parameter name="STATUS" value="ACTIVE" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <result column="ACCESS_TOKEN" name="access_token"/>
-        </statement>
-    </dblookup>
+    <call-template target="com.apigate.omoney.getAccessToken.Template"/>
 
-    <log level="custom">
+    <log category="DEBUG" level="custom">
+        <property name="retrieved" value="Orange access token"/>
         <property expression="$ctx:access_token" name="active access token" xmlns:ns="http://org.apache.synapse/xsd"/>
     </log>
 
     <property xmlns:ns="http://org.apache.synapse/xsd"
               name="Authorization"
-              expression="fn:concat('Basic ', get-property('access_token'))"
+              expression="fn:concat('Bearer ', get-property('access_token'))"
               scope="transport"/>
 
     <enrich>
@@ -82,9 +53,6 @@
         <target type="body"/>
     </enrich>
 
-    <log level="custom">
-        <property value="completed successfully" name="Web payment database update" xmlns:ns="http://org.apache.synapse/xsd"/>
-    </log>
     <send>
         <endpoint key="nodeRedEnd"/>
     </send>

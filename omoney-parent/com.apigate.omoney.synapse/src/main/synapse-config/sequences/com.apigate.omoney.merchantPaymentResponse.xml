@@ -1,32 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="com.apigate.omoney.merchantPaymentResponse" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <log level="custom">
-        <property name="query2" value="*********** recieved from Orange back-end *************"/>
-    </log>
 
-    <property expression="json-eval($.pay_token)" name="pay_token" scope="default" type="STRING"/>
-    <property expression="json-eval($.notif_token)" name="notif_token" scope="default" type="STRING"/>
+    <property expression="$axis2:HTTP_SC" name="http_status" xmlns:ns="http://org.apache.synapse/xsd"/>
 
-    <log level="custom">
-        <property expression="$ctx:pay_token" name="Orange Pay Token" xmlns:ns="http://org.apache.synapse/xsd"/>
-        <property expression="$ctx:notif_token" name="Orange notif token" xmlns:ns="http://org.apache.synapse/xsd"/>
-    </log>
+    <filter regex="403" source="$ctx:http_status" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
 
-    <dbreport>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[UPDATE OMONEY_LOG SET PAY_TOKEN = ?, NOTIFY_TOKEN = ? WHERE ORDER_ID = ?]]></sql>
-            <parameter expression="get-property('pay_token')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="get-property('notif_token')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-            <parameter expression="get-property('order_id')" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
-        </statement>
-    </dbreport>
+            <property value="NULL" name="pay_token" scope="default" type="STRING"/>
+            <property value="NULL" name="notif_token" scope="default" type="STRING"/>
+            <property value="NULL" name="message" scope="default" type="STRING"/>
+            <property value="NULL" name="status" scope="default" type="STRING"/>
 
-    <log level="custom">
-        <property value="completed successfully" name="database update for Web payment Orange responsesss " xmlns:ns="http://org.apache.synapse/xsd"/>
-    </log>
+            <call-template target="com.apigate.omoney.merchantPayment.Template">
+                <with-param name="order_id" value="{get-property('order_id')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="currency" value="{get-property('currency')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="amount" value="{get-property('amount')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="language" value="{get-property('language')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="reference" value="{get-property('reference')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="notif_url" value="{get-property('notif_url')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="status" value="{get-property('status')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="payload" value="{get-property('payload')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="pay_token" value="{get-property('pay_token')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="notif_token" value="{get-property('notif_token')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="http_status" value="{get-property('http_status')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </call-template>
+
+            <log level="custom">
+                <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property value="Error during Web payment" name="Transaction result" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+
+        </then>
+        <else>
+            <property expression="json-eval($.pay_token)" name="pay_token" scope="default" type="STRING"/>
+            <property expression="json-eval($.notif_token)" name="notif_token" scope="default" type="STRING"/>
+            <property expression="json-eval($.message)" name="message" scope="default" type="STRING"/>
+            <property value="INITIATED" name="status" scope="default" type="STRING"/>
+
+            <call-template target="com.apigate.omoney.merchantPayment.Template">
+                <with-param name="order_id" value="{get-property('order_id')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="currency" value="{get-property('currency')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="amount" value="{get-property('amount')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="language" value="{get-property('language')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="reference" value="{get-property('reference')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="notif_url" value="{get-property('notif_url')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="status" value="{get-property('status')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="payload" value="{get-property('payload')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="pay_token" value="{get-property('pay_token')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="notif_token" value="{get-property('notif_token')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <with-param name="http_status" value="{get-property('http_status')}" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </call-template>
+
+            <log level="custom">
+                <property expression="$ctx:http_status" name="HTTP response" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:pay_token" name="Orange Pay Token" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:notif_token" name="Orange notif token" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="$ctx:message" name="Message" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property value="Web Payment Successful" name="Transaction result" xmlns:ns="http://org.apache.synapse/xsd"/>
+            </log>
+
+        </else>
+    </filter>
 </sequence>

@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="com.apigate.omoney.periodicStatusRequest" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
     <log level="custom">
-        <property name="query" value="*********** starting the periodic status update *************"/>
+        <property name="Periodic status check" value="Started"/>
     </log>
 
     <property expression="get-property('registry', 'conf:/repository/wso2telco/configurations/omoneyConfig.xml')"
               name="xmlFile" scope="default" type="OM"/>
     <property expression="$ctx:xmlFile//status_request/batch_size" name="batch_size" scope="default" type="STRING"/>
     <property expression="$ctx:xmlFile//status_request/retry_period" name="retry_period" scope="default" type="STRING"/>
+    <property expression="$ctx:xmlFile//status_request/retry_count" name="retry_count" scope="default" type="STRING"/>
 
+    <call-template target="com.apigate.omoney.getAccessToken.Template"/>
+    <log category="DEBUG" level="custom">
+        <property name="retrieved" value="Orange access token"/>
+        <property expression="$ctx:access_token" name="active access token" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
 
-    <dblookup>
-        <connection>
-            <pool>
-                <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
-            </pool>
-        </connection>
-        <statement>
-            <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS= ? ORDER BY ID DESC LIMIT 1 ]]></sql>
-            <parameter type="VARCHAR" value="ACTIVE"/>
-            <result column="ACCESS_TOKEN" name="access_token"/>
-        </statement>
-    </dblookup>
-
-    <property name="sql_1" value="SELECT ORDER_ID, AMOUNT, PAY_TOKEN, STATUS, COUNTER FROM OMONEY_LOG WHERE (STATUS='INITIATED' OR STATUS='PENDING') AND 5 > COUNTER AND LOGGED_TIME >= NOW() - INTERVAL "/>
-    <property name="sql_2" value=" HOUR ORDER BY LOGGED_TIME ASC LIMIT "/>
-    <property expression="fn:concat($ctx:sql_1, $ctx:retry_period, $ctx:sql_2, $ctx:batch_size)"
+    <property name="sql_1" value="SELECT ORDER_ID, AMOUNT, PAY_TOKEN, NOTIFY_TOKEN, STATUS, COUNTER FROM OMONEY_LOG WHERE (STATUS='INITIATED' OR STATUS='PENDING') AND "/>
+    <property name="sql_2" value=" > COUNTER AND LOGGED_TIME >= NOW() - INTERVAL "/>
+    <property name="sql_3" value=" HOUR AND HTTP_CODE='201' ORDER BY LOGGED_TIME ASC LIMIT "/>
+    <property expression="fn:concat($ctx:sql_1, $ctx:retry_count, $ctx:sql_2, $ctx:retry_period, $ctx:sql_3, $ctx:batch_size)"
               name="SELECT_QUERY" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
 
     <property name="SELECT_QUERY_ENRICH_BODY" scope="default" type="STRING" value="true"/>
@@ -43,7 +37,7 @@
                 <property expression="//RESULT_ARRAY/ORDER_ID/text()" name="order_id"/>
                 <property expression="//RESULT_ARRAY/AMOUNT/text()" name="amount"/>
                 <property expression="//RESULT_ARRAY/PAY_TOKEN/text()" name="pay_token"/>
-                <property expression="//RESULT_ARRAY/STATUS/text()" name="payment_status"/>
+                <property expression="//RESULT_ARRAY/NOTIFY_TOKEN/text()" name="notif_token"/>
                 <property expression="//RESULT_ARRAY/COUNTER/text()" name="counter"/>
 
                 <payloadFactory media-type="json">
@@ -66,16 +60,16 @@
                 <property name="ContentType" scope="axis2" type="STRING" value="application/json"/>
                 <property name="messageType" scope="axis2" value="application/json"/>
 
-                <log level="custom">
+                <log category="DEBUG" level="custom">
                     <property expression="$ctx:order_id" name="order_id"/>
                     <property expression="$ctx:amount" name="amount"/>
                     <property expression="$ctx:pay_token" name="pay_token"/>
-                    <property value="generated successfully" name="Web payment Status request" xmlns:ns="http://org.apache.synapse/xsd"/>
                 </log>
-                <send receive="com.apigate.omoney.dbStatusUpdator">
+                <send receive="com.apigate.omoney.periodicStatusResponse">
                     <endpoint key="nodeRedEnd"/>
                 </send>
             </sequence>
         </target>
     </iterate>
+    <drop/>
 </sequence>

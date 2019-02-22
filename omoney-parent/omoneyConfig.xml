@@ -9,6 +9,7 @@
 	</endPoints>
 	<status_request>
 		<batch_size>100</batch_size>
-		<retry_period>4</retry_period>	<!-- This is the look back period in hours to select the 'pending' transaction list -->
+		<retry_period>4</retry_period>		<!-- This is the look back period in hours to select the 'pending' transaction list -->
+		<retry_count>5</retry_count>
 	</status_request>
 </customConfigs>
