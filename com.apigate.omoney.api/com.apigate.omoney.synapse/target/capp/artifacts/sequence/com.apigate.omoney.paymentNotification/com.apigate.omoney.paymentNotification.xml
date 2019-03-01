@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.paymentNotification" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log level="custom">
+        <property name="received" value="Web payment notification"/>
+    </log>
+
+    <clone sequential="false">
+        <target>
+            <sequence>
+                <property name="HTTP_SC" scope="axis2" value="204"/>
+                <respond/>
+            </sequence>
+        </target>
+        <target>
+            <sequence>
+                <property expression="json-eval($.status)"
+                          name="payment_status" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="json-eval($.notif_token)"
+                          name="notif_token" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property expression="json-eval($.txnid)" name="txnid"
+                          scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <dblookup>
+                    <connection>
+                        <pool>
+                            <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                        </pool>
+                    </connection>
+                    <statement>
+                        <sql><![CDATA[ SELECT STATUS, NOTIFY_URL, COUNTER FROM OMONEY_LOG WHERE NOTIFY_TOKEN= ? ]]></sql>
+                        <parameter expression="$ctx:notif_token"
+                                   type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                        <result column="COUNTER" name="counter"/>
+                        <result column="NOTIFY_URL" name="notify_url"/>
+                        <result column="STATUS" name="db_status"/>
+                    </statement>
+                </dblookup>
+                <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('db_status') ='INITIATED' or get-property('db_status') ='PENDING'">
+                    <then>
+                        <call-template target="com.apigate.omoney.paymentStatus.Template">
+                            <with-param name="payment_status" value="{get-property('payment_status')}"/>
+                            <with-param name="txnid" value="{get-property('txnid')}"/>
+                            <with-param name="counter" value="{get-property('counter')}"/>
+                            <with-param name="notif_token" value="{get-property('notif_token')}"/>
+                        </call-template>
+                        <log level="custom">
+                            <property name="Payment Status" value="updated on database"/>
+                            <property expression="$ctx:payment_status" name="Status"/>
+                            <property expression="$ctx:notif_token" name="Notif Token"/>
+                            <property expression="$ctx:txnid" name="Txnid"/>
+                        </log>
+                    </then>
+                    <else>
+                        <log level="custom">
+                            <property name="Payment Status" value="already updated on database"/>
+                            <property expression="$ctx:payment_status" name="Status"/>
+                            <property expression="$ctx:notif_token" name="Notif Token"/>
+                            <property expression="$ctx:txnid" name="Txnid"/>
+                        </log>
+                    </else>
+                </filter>
+                <property expression="get-property('notify_url')"
+                          name="uri.var.merchant.notif.endpoint"
+                          scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <property name="OUT_ONLY" value="true"/>
+                <call>
+                    <endpoint key="merchantEnd"/>
+                </call>
+            </sequence>
+        </target>
+    </clone>
+    <drop/>
+</sequence>

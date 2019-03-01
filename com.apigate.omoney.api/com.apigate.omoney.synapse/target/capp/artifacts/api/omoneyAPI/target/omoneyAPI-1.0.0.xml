@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/omoney" name="omoneyAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource faultSequence="com.apigate.omoney.faultSequence" inSequence="com.apigate.omoney.merchantPaymentRequest" methods="POST" url-mapping="/webpayment">
+        <outSequence>
+            <sequence key="com.apigate.omoney.merchantPaymentResponse"/>
+            <respond/>
+        </outSequence>
+    </resource>
+    <resource faultSequence="com.apigate.omoney.faultSequence" inSequence="com.apigate.omoney.merchantStatusRequest" methods="POST" url-mapping="/transactionstatus">
+        <outSequence/>
+    </resource>
+    <resource faultSequence="com.apigate.omoney.faultSequence" inSequence="com.apigate.omoney.paymentNotification" methods="POST" url-mapping="/notif">
+        <outSequence/>
+    </resource>
+</api>

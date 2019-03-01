@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.merchantStatusRequest" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="transactionstatus"/>
+    <property expression="json-eval($.order_id)" name="order_id" scope="default" type="STRING"/>
+    <property expression="json-eval($.pay_token)" name="pay_token" scope="default" type="STRING"/>
+
+    <call-template target="com.apigate.omoney.getAccessToken.Template"/>
+
+    <log category="DEBUG" level="custom">
+        <property value="successful" name="Retriving valid Access Token" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:access_token" name="Access Token" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <property xmlns:ns="http://org.apache.synapse/xsd"
+              name="Authorization"
+              expression="fn:concat('Bearer ', get-property('access_token'))"
+              scope="transport"/>
+
+    <log level="custom">
+        <property value="delivered to Operator backend" name="Web Payment Status request" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:order_id" name="Order ID" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <call>
+        <endpoint key="orangeEnd"/>
+    </call>
+    <log level="custom">
+        <property value="delivered" name="Web Payment Status received. Merchant respond" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <respond/>
+</sequence>

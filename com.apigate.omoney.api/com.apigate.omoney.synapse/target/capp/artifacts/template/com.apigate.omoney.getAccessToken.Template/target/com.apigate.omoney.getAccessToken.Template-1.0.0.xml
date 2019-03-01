@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="com.apigate.omoney.getAccessToken.Template" xmlns="http://ws.apache.org/ns/synapse">
+    <sequence>
+
+        <dblookup>
+            <connection>
+                <pool>
+                    <dsName>jdbc/WSO2TELCO_DEP_DB</dsName>
+                </pool>
+            </connection>
+            <statement>
+                <sql><![CDATA[ SELECT * FROM OMONEY_KEYS WHERE STATUS= ? ORDER BY ID DESC LIMIT 1 ]]></sql>
+                <parameter name="STATUS" value="ACTIVE" type="VARCHAR" xmlns:ns="http://org.apache.synapse/xsd"/>
+                <result column="ACCESS_TOKEN" name="access_token"/>
+            </statement>
+        </dblookup>
+
+    </sequence>
+</template>
