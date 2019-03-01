@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="com.apigate.omoney.merchantPaymentRequest" onError="com.apigate.omoney.faultSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+
+    <property name="uri.var.omoney_backend.name" scope="default" type="STRING" value="webpayment"/>
+
+    <property expression="get-property('registry', 'conf:/repository/wso2telco/configurations/omoneyConfig.xml')" name="xmlFile" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:xmlFile//merchant_key" name="reg_merchant_key" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:xmlFile//endPoints/notify" name="reg_notify" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+
+    <property expression="json-eval($.)" name="payload" scope="default" type="STRING"/>
+    <property expression="json-eval($.currency)" name="currency" scope="default" type="STRING"/>
+    <property expression="json-eval($.order_id)" name="order_id" scope="default" type="STRING"/>
+    <property expression="json-eval($.amount)" name="amount" scope="default" type="DOUBLE"/>
+    <property expression="json-eval($.notif_url)" name="notif_url" scope="default" type="STRING"/>
+    <property expression="json-eval($.lang)" name="language" scope="default" type="STRING"/>
+    <property expression="json-eval($.reference)" name="reference" scope="default" type="STRING"/>
+
+    <!-- Validates mandatory parameters -->
+
+    <filter regex="false" source="boolean(get-property('currency'))" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <property name="currency" scope="default" type="STRING" value="NULL"/>
+        </then>
+        <else/>
+    </filter>
+
+    <filter regex="false" source="boolean(get-property('order_id'))" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <property name="order_id" scope="default" type="STRING" value="NULL"/>
+        </then>
+        <else/>
+    </filter>
+
+    <filter regex="false" source="boolean(get-property('amount'))" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <property name="amount" scope="default" type="DOUBLE" value="0.0"/>
+        </then>
+        <else/>
+    </filter>
+
+    <filter regex="false" source="boolean(get-property('notif_url'))" xmlns:ns="http://org.apache.synapse/xsd">
+        <then>
+            <property name="notif_url" scope="default" type="STRING" value="NULL"/>
+        </then>
+        <else/>
+    </filter>
+
+    <log level="custom">
+        <property name="received" value="New web payment request "/>
+        <property expression="$ctx:order_id" name="payment ID" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="$ctx:amount" name="payment amount" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <call-template target="com.apigate.omoney.getAccessToken.Template"/>
+
+    <log category="DEBUG" level="custom">
+        <property name="retrieved" value="Orange access token"/>
+        <property expression="$ctx:access_token" name="active access token" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+
+    <property xmlns:ns="http://org.apache.synapse/xsd"
+              name="Authorization"
+              expression="fn:concat('Bearer ', get-property('access_token'))"
+              scope="transport"/>
+
+    <enrich>
+        <source clone="true" type="inline">
+            <merchant_key xmlns=""/>
+        </source>
+        <target action="child" xmlns:ns="http://org.apache.synapse/xsd" xpath="//jsonObject"/>
+    </enrich>
+    <enrich>
+        <source clone="true" property="reg_merchant_key" type="property"/>
+        <target xmlns:ns="http://org.apache.synapse/xsd" xpath="//merchant_key"/>
+    </enrich>
+    <enrich>
+        <source clone="true" property="reg_notify" type="property"/>
+        <target xmlns:ns="http://org.apache.synapse/xsd" xpath="//notif_url"/>
+    </enrich>
+    <enrich>
+        <source clone="true" xmlns:ns="http://org.apache.synapse/xsd" xpath="//jsonObject"/>
+        <target type="body"/>
+    </enrich>
+
+    <send>
+        <endpoint key="orangeEnd"/>
+    </send>
+</sequence>
